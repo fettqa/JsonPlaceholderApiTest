@@ -1,43 +1,34 @@
-import org.junit.jupiter.api.Assertions;
+import io.restassured.http.ContentType;
+import org.assertj.core.api.ObjectAssert;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import retrofit.adapters.APIService;
-import retrofit.pojo.Posts;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import pojo.Posts;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.function.Function;
+
+import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class ApiTest {
 
-    Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://jsonplaceholder.typicode.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
+    @BeforeAll
+    static void setup() {
+    }
 
     @Test
-    public void test(){
-        APIService apiService = retrofit.create(APIService.class);
-        Call<List<Posts>> posts = apiService.getPosts();
+    public void getPosts() {
+        List<Posts> posts = given()
+                .baseUri("http://jsonplaceholder.typicode.com")
+                .basePath("/posts")
+                .contentType(ContentType.JSON)
+                .when().get()
+                .then()
+                .statusCode(200)
+                .extract().jsonPath()
+                .getList("$",Posts.class);
 
-        posts.enqueue(new Callback<List<Posts>>() {
-            @Override
-            public void onResponse(Call<List<Posts>> call, Response<List<Posts>> response) {
-                Assertions.assertEquals(response.code(),200);
-            }
-
-            @Override
-            public void onFailure(Call<List<Posts>> call, Throwable throwable) {
-
-            }
-        });
-        try {
-            System.out.println(posts.execute().body());
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+        ObjectAssert<List<Posts>> a = assertThat(posts);
+        a.extracting(Posts::getTitle).contains("");
     }
 }
