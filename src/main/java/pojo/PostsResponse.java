@@ -6,12 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor @NoArgsConstructor
-public class PostsResponse {
-
-    private int userId;
+public class PostsResponse extends PostsRequest {
     private int id;
-    private String title;
-    private String body;
 }
