@@ -1,6 +1,8 @@
 package steps;
 
+import io.qameta.allure.Attachment;
 import io.qameta.allure.Step;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
@@ -16,12 +18,14 @@ public class PostSteps {
 
     private static final RequestSpecification SPECIFICATION =
             new RequestSpecBuilder()
+                    .addFilter(new AllureRestAssured())
                     .setBaseUri("http://jsonplaceholder.typicode.com")
                     .setBasePath("/posts")
                     .setContentType(ContentType.JSON)
                     .build();
 
     @Step("Получение списка пользователей")
+    @Attachment
     public static List<PostsResponse> getPosts() {
         return given().spec(SPECIFICATION)
                 .when()
@@ -34,7 +38,7 @@ public class PostSteps {
                 .getList("$", PostsResponse.class);
     }
 
-    @Step("Добавить пост {rqBody}")
+    @Step("Добавить пост c userId = {rqBody.userId}, title = {rqBody.title}, body = {rqBody.body}")
     public static PostsResponse setPost(PostsRequest rqBody) {
         return given().spec(SPECIFICATION)
                 .when()

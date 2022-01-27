@@ -1,3 +1,6 @@
+import io.qameta.allure.Description;
+import io.qameta.allure.Story;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pojo.PostsRequest;
 import pojo.PostsResponse;
@@ -7,11 +10,13 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+@DisplayName("Тест api: http://jsonplaceholder.typicode.com/")
 public class ApiTest {
 
+    @Description("Тест api /posts")
+    @Story("api /post test")
     @Test
-    public void getPosts() {
+    public void postsTest() {
         List<PostsResponse> oldPosts = PostSteps.getPosts();
 
         PostsRequest newPost = PostsRequest.builder()
