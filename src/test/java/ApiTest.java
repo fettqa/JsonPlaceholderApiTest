@@ -1,49 +1,37 @@
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import pojo.PostsRequest;
 import pojo.PostsResponse;
 import steps.PostSteps;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class ApiTest {
 
-    @BeforeAll
-    static void setup() {
-
-    }
-
     @Test
     public void getPosts() {
-        List<PostsResponse> posts = PostSteps.getPosts();
+        List<PostsResponse> oldPosts = PostSteps.getPosts();
 
-        assertThat(posts).extracting(PostsResponse::getTitle).contains("");
-    }
+        PostsRequest newPost = PostsRequest.builder()
+                .userId(11)
+                .title("some title")
+                .body("some body")
+                .build();
 
-    @Test
-    public void setPost(){
-        PostsRequest rq = new PostsRequest();
-        rq.setUserId(10);
-        rq.setTitle("some title");
-        rq.setBody("some body");
+        assertThat(oldPosts).extracting(PostsResponse::getUserId).isNotEqualTo(newPost.getUserId());
 
-        PostsResponse rs = given()
-                .baseUri("http://jsonplaceholder.typicode.com")
-                .basePath("/posts")
-                .contentType(ContentType.JSON)
-                .body(rq)
-                .when().post()
-                .then().extract().as(PostsResponse.class);
+        PostsResponse newPostResponse = PostSteps.setPost(newPost);
+        PostsRequest createdPost = newPostResponse.convertToRequest();
 
-        assertThat(rs)
-                .isNotNull()
-                .extracting(PostsResponse::getUserId).isEqualTo(rq.getUserId());
+        assertThat(newPost).isEqualTo(createdPost);
+        assertThat(newPostResponse).extracting(PostsResponse::getUserId).isEqualTo(newPost.getUserId());
+
+        List<PostsResponse> newPosts = PostSteps.getPosts();
+
+        assertThat(newPosts.stream().map(PostsResponse::getUserId)).contains(newPost.getUserId());
+
     }
 
 }
