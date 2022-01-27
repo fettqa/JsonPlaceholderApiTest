@@ -1,6 +1,5 @@
 package steps;
 
-import io.qameta.allure.Attachment;
 import io.qameta.allure.Step;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -24,8 +23,7 @@ public class PostSteps {
                     .setContentType(ContentType.JSON)
                     .build();
 
-    @Step("Получение списка пользователей")
-    @Attachment
+    @Step("Get posts list")
     public static List<PostsResponse> getPosts() {
         return given().spec(SPECIFICATION)
                 .when()
@@ -38,7 +36,7 @@ public class PostSteps {
                 .getList("$", PostsResponse.class);
     }
 
-    @Step("Добавить пост c userId = {rqBody.userId}, title = {rqBody.title}, body = {rqBody.body}")
+    @Step("Add new post with userId = {rqBody.userId}, title = {rqBody.title}, body = {rqBody.body}")
     public static PostsResponse setPost(PostsRequest rqBody) {
         return given().spec(SPECIFICATION)
                 .when()

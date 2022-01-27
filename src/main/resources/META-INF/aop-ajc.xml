@@ -1,5 +1,5 @@
 <aspectj>
     <aspects>
-        <aspect name = "AssertjLogger"></aspect>
+        <aspect name="AssertjLogger"></aspect>
     </aspects>
 </aspectj>

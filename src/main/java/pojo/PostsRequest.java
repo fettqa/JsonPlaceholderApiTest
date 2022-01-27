@@ -14,4 +14,5 @@ public class PostsRequest {
     private int userId;
     private String title;
     private String body;
+
 }

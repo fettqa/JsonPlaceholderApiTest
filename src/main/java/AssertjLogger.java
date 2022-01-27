@@ -22,26 +22,30 @@ public class AssertjLogger {
     }
 
     @Pointcut("call(* org.assertj.core.api.*.extracting(..))")
-    public void extract(){}
+    public void extract() {
+    }
 
     @Around("extract()")
     public Object extractingStep(ProceedingJoinPoint joinPoint) throws Throwable {
+        return step(joinPoint, "Every element of list ");
+    }
+
+    Object step(ProceedingJoinPoint joinPoint, String name) throws Throwable {
         String uuid = UUID.randomUUID().toString();
-        System.out.println("AXAXAAXAXAX");
-        getLifecycle().startStep(uuid,new StepResult().setName("AXAXAXAXA" + joinPoint.getArgs()[0]));
+        getLifecycle().startStep(uuid, new StepResult().setName(name));
 
         try {
             Object proceed = joinPoint.proceed();
-            getLifecycle().updateStep(uuid,s -> s.setStatus(Status.PASSED));
+            getLifecycle().updateStep(uuid, s -> s.setStatus(Status.PASSED));
             return proceed;
-        }catch (Throwable e){
+        } catch (Throwable e) {
             getLifecycle().updateStep(uuid, s -> s
                     .setStatus(getStatus(e)
                             .orElse(Status.BROKEN))
                     .setStatusDetails(getStatusDetails(e)
                             .orElse(null)));
             throw e;
-        }finally {
+        } finally {
             getLifecycle().stopStep(uuid);
         }
     }
